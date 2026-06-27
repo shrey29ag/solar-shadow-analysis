@@ -16,6 +16,7 @@ export default function WaterTank({
       position={[x, y + height / 2, z]} // Shift Y to keep base at ground level
       castShadow
       receiveShadow
+      userData={{ role: "occluder" }}
     >
       <cylinderGeometry args={[radius, radius, height, 32]} />
       <meshStandardMaterial

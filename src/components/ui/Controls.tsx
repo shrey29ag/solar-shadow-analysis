@@ -19,12 +19,14 @@ export function NumberInput({
   step = 0.5,
   onChange,
 }: NumberInputProps) {
+  const [prevValue, setPrevValue] = useState<number>(value);
   const [tempValue, setTempValue] = useState<string>(value.toString());
 
-  // Sync temp state with external value changes
-  React.useEffect(() => {
+  // Sync temp state with external value changes during render (derived state)
+  if (!Object.is(value, prevValue)) {
+    setPrevValue(value);
     setTempValue(value.toString());
-  }, [value]);
+  }
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawVal = e.target.value;

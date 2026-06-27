@@ -1,13 +1,21 @@
 "use client";
 
-import React from "react";
-import { SolarTableProps } from "@/types";
+import React, { useCallback } from "react";
+import * as THREE from "three";
+import { SolarTableProps, PanelAnalysisResult } from "@/types";
 import SolarPanel from "./SolarPanel";
+
+interface SolarTablePropsWithRefs extends SolarTableProps {
+  analysisResults?: PanelAnalysisResult[];
+  onRegisterPanelRef?: (tableId: string, panelId: string, ref: THREE.Mesh | null) => void;
+}
 
 export default function SolarTable({
   position,
   id,
-}: SolarTableProps) {
+  analysisResults,
+  onRegisterPanelRef,
+}: SolarTablePropsWithRefs) {
   const [x, y, z] = position;
 
   // Module dimensions
@@ -39,6 +47,26 @@ export default function SolarTable({
   const backLegZWorld = -legOffsetZLocal * Math.cos(tiltRadians);
   const backLegYWorld = pivotHeight + legOffsetZLocal * Math.sin(tiltRadians);
 
+  const handleRegisterRef = useCallback(
+    (panelId: string, ref: THREE.Mesh | null) => {
+      if (onRegisterPanelRef) {
+        onRegisterPanelRef(id, panelId, ref);
+      }
+    },
+    [id, onRegisterPanelRef]
+  );
+
+  // Build a lookup for analysis results by panelId
+  const analysisMap = React.useMemo(() => {
+    const map: Record<string, PanelAnalysisResult> = {};
+    if (analysisResults) {
+      for (const r of analysisResults) {
+        map[r.panelId] = r;
+      }
+    }
+    return map;
+  }, [analysisResults]);
+
   return (
     <group position={[x, y, z]}>
       {/* Tilted Panel Array and Rails */}
@@ -61,36 +89,38 @@ export default function SolarTable({
 
         {/* Render 6 Panels in a 2x3 configuration */}
         {columns.map((colVal, colIdx) =>
-          rows.map((rowVal, rowIdx) => (
-            <SolarPanel
-              key={`${id}-panel-${colIdx}-${rowIdx}`}
-              width={panelWidth}
-              length={panelLength}
-              thickness={panelThickness}
-              position={[colVal, 0, rowVal]}
-            />
-          ))
+          rows.map((rowVal, rowIdx) => {
+            const panelId = `${id}-panel-${colIdx}-${rowIdx}`;
+            const result = analysisMap[panelId];
+            return (
+              <SolarPanel
+                key={panelId}
+                panelId={panelId}
+                width={panelWidth}
+                length={panelLength}
+                thickness={panelThickness}
+                position={[colVal, 0, rowVal]}
+                shadowStatus={result?.status}
+                onRegisterRef={handleRegisterRef}
+              />
+            );
+          })
         )}
       </group>
 
-      {/* Structural Support Legs (Extending from rails to the ground) */}
-      {/* Front Left Leg */}
+      {/* Structural Support Legs */}
       <mesh position={[-legOffsetX, frontLegYWorld / 2, frontLegZWorld]} castShadow receiveShadow>
         <boxGeometry args={[0.06, frontLegYWorld, 0.06]} />
         <meshStandardMaterial color="#6b7280" roughness={0.3} metalness={0.8} />
       </mesh>
-      {/* Front Right Leg */}
       <mesh position={[legOffsetX, frontLegYWorld / 2, frontLegZWorld]} castShadow receiveShadow>
         <boxGeometry args={[0.06, frontLegYWorld, 0.06]} />
         <meshStandardMaterial color="#6b7280" roughness={0.3} metalness={0.8} />
       </mesh>
-
-      {/* Back Left Leg */}
       <mesh position={[-legOffsetX, backLegYWorld / 2, backLegZWorld]} castShadow receiveShadow>
         <boxGeometry args={[0.06, backLegYWorld, 0.06]} />
         <meshStandardMaterial color="#6b7280" roughness={0.3} metalness={0.8} />
       </mesh>
-      {/* Back Right Leg */}
       <mesh position={[legOffsetX, backLegYWorld / 2, backLegZWorld]} castShadow receiveShadow>
         <boxGeometry args={[0.06, backLegYWorld, 0.06]} />
         <meshStandardMaterial color="#6b7280" roughness={0.3} metalness={0.8} />

@@ -84,12 +84,12 @@ body {
 
 .sidebar-scroll-area {
   flex-grow: 1;
+  min-height: 0; /* Constraints flex container to prevent contents from pushing height beyond body */
   overflow-y: auto;
-  margin-right: -12px;
-  padding-right: 12px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding-right: 4px;
 }
 
 /* Scrollbar styling */
@@ -110,6 +110,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 4px;
+  flex-shrink: 0; /* Prevents parent flexbox from shrinking sections and clipping inputs */
 }
 
 .property-section-header {
@@ -246,5 +247,107 @@ body {
   }
   .canvas-container {
     height: 55%;
-  }
+}
+}
+
+/* Sun controls specifics */
+.sun-mode-toggle {
+  display: flex;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sun-mode-btn {
+  flex: 1;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.sun-mode-btn.active {
+  background-color: var(--accent-color);
+  color: #ffffff;
+}
+
+.control-date-box,
+.control-time-box {
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  outline: none;
+  font-family: inherit;
+  color: var(--text-primary);
+  background-color: #ffffff;
+}
+
+.control-date-box:focus,
+.control-time-box:focus {
+  border-color: var(--accent-color);
+}
+
+.sun-calculated-badge {
+  margin-top: 8px;
+  padding: 10px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sun-calculated-badge strong {
+  color: var(--text-primary);
+}
+
+/* ── Phase 5: Shadow Analysis Display ─────────────────────────────── */
+.analysis-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.analysis-good {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.analysis-bad {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.panel-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffffff;
+  border-radius: 3px;
+  padding: 4px 2px;
+  cursor: default;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
