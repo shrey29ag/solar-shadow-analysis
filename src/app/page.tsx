@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import Sidebar from "@/components/ui/Sidebar";
+import Dashboard from "@/components/ui/Dashboard";
 import MainCanvas from "@/components/scene/MainCanvas";
 import { BuildingState, WaterTankState, SolarTableState, TableAnalysisResult } from "@/types";
 import { calculateSunPosition, getSunDirectionVector } from "@/utils/sunEngine";
@@ -30,6 +31,9 @@ export default function Home() {
   const [date, setDate] = useState<string>("2026-06-27");
   const [time, setTime] = useState<string>("09:00");
 
+  // ── Dashboard toggle ─────────────────────────────────────────────────────
+  const [showDashboard, setShowDashboard] = useState<boolean>(false);
+
   // ── Analysis results from shadow engine ─────────────────────────────────
   const [analysisResults, setAnalysisResults] = useState<TableAnalysisResult[]>([]);
 
@@ -47,6 +51,11 @@ export default function Home() {
   const handleAnalysisUpdate = useCallback((results: TableAnalysisResult[]) => {
     setAnalysisResults(results);
   }, []);
+
+  // Build table name lookup for Dashboard
+  const tableNames: Record<string, string> = Object.fromEntries(
+    solarTables.map((st) => [st.id, st.name])
+  );
 
   return (
     <div className="app-container">
@@ -71,14 +80,37 @@ export default function Home() {
         activeElevation={activeElevation}
         analysisResults={analysisResults}
       />
-      <MainCanvas
-        buildings={buildings}
-        waterTanks={waterTanks}
-        solarTables={solarTables}
-        sunDirection={sunDirection}
-        sunElevation={activeElevation}
-        onAnalysisUpdate={handleAnalysisUpdate}
-      />
+
+      <div className="canvas-wrapper">
+        {/* Dashboard toggle button */}
+        <button
+          id="dashboard-toggle"
+          type="button"
+          className="dashboard-toggle-btn"
+          onClick={() => setShowDashboard((v) => !v)}
+        >
+          {showDashboard ? "✕ Close Dashboard" : "📊 Dashboard"}
+        </button>
+
+        <MainCanvas
+          buildings={buildings}
+          waterTanks={waterTanks}
+          solarTables={solarTables}
+          sunDirection={sunDirection}
+          sunElevation={activeElevation}
+          onAnalysisUpdate={handleAnalysisUpdate}
+        />
+
+        {/* Dashboard overlay */}
+        {showDashboard && (
+          <div className="dashboard-overlay">
+            <Dashboard
+              analysisResults={analysisResults}
+              solarTableNames={tableNames}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

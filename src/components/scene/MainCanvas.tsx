@@ -38,7 +38,7 @@ function Scene({
   panelRefsMap,
   occluderRefsMap,
 }: SceneProps) {
-  const { scene } = useThree();
+
   const frameCountRef = useRef(0);
 
   // Analysis results state — local to Scene so we can pass to SolarTable
@@ -240,25 +240,17 @@ function Scene({
 
 // ─── Occluder mesh collector helper ──────────────────────────────────────────
 interface OccluderCollectorProps {
-  buildings: BuildingState[];
-  waterTanks: WaterTankState[];
   occluderRefsMap: React.MutableRefObject<Map<string, THREE.Mesh>>;
 }
 
-function OccluderCollector({ buildings, waterTanks, occluderRefsMap }: OccluderCollectorProps) {
+function OccluderCollector({ occluderRefsMap }: OccluderCollectorProps) {
   const { scene } = useThree();
 
   useFrame(() => {
     occluderRefsMap.current.clear();
     scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        // Collect building and water tank meshes by checking userData or name
-        const isOccluder =
-          obj.userData?.role === "occluder" ||
-          (obj.castShadow && !obj.userData?.isPanel);
-        if (isOccluder) {
-          occluderRefsMap.current.set(obj.uuid, obj);
-        }
+      if (obj instanceof THREE.Mesh && obj.userData?.role === "occluder") {
+        occluderRefsMap.current.set(obj.uuid, obj);
       }
     });
   });
@@ -295,11 +287,7 @@ export default function MainCanvas({
           panelRefsMap={panelRefsMap}
           occluderRefsMap={occluderRefsMap}
         />
-        <OccluderCollector
-          buildings={buildings}
-          waterTanks={waterTanks}
-          occluderRefsMap={occluderRefsMap}
-        />
+        <OccluderCollector occluderRefsMap={occluderRefsMap} />
       </Canvas>
     </div>
   );
