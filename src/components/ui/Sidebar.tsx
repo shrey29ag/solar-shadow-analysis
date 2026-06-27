@@ -61,8 +61,6 @@ export default function Sidebar({
     <aside className="sidebar">
       <div className="sidebar-header">
         <h1>Solar Shadow Analysis</h1>
-        <div className="phase-badge">Phase 5</div>
-        <p className="phase-subtitle">Shadow & Efficiency Engine</p>
       </div>
 
       <div className="sidebar-scroll-area">

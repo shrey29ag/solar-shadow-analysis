@@ -247,3 +247,192 @@ solar-panel/
 ├── tsconfig.json
 └── next.config.ts
 ```
+
+---
+
+## Data Flow Diagram
+
+```mermaid
+flowchart LR
+
+subgraph UI
+  A[React Components]
+  A --> B[Sidebar]
+  A --> C[Dashboard]
+  A --> D[Canvas]
+end
+
+subgraph State
+  E[Global State]
+end
+
+subgraph Scene
+  F[Ground]
+  G[Buildings]
+  H[Water Tanks]
+  I[Solar Tables]
+  J[Sun]
+end
+
+subgraph Analysis
+  K[Sun Position]
+  L[Shadow Engine]
+  M[Efficiency Engine]
+  N[EOF Calculator]
+end
+
+subgraph Output
+  O[Charts]
+  P[Metrics]
+  Q[Panel Scores]
+end
+
+B --> E
+
+E --> F
+E --> G
+E --> H
+E --> I
+E --> J
+
+J --> K
+
+K --> L
+
+G --> L
+H --> L
+I --> L
+
+L --> M
+
+M --> N
+
+N --> O
+N --> P
+N --> Q
+```
+
+---
+
+## System Architecture
+
+```mermaid
+flowchart TD
+    A[User]
+
+    A --> B[Next.js Frontend]
+
+    B --> C[Sidebar Controls]
+    B --> D[React Three Fiber Canvas]
+    B --> E[Analytics Dashboard]
+
+    C --> C1[Buildings Controls]
+    C --> C2[Water Tank Controls]
+    C --> C3[Solar Table Controls]
+    C --> C4[Sun Controls]
+
+    C1 --> F[Global State Store]
+    C2 --> F
+    C3 --> F
+    C4 --> F
+
+    F --> D
+
+    D --> G[Ground]
+    D --> H[Buildings]
+    D --> I[Water Tanks]
+    D --> J[Solar Table 1]
+    D --> K[Solar Table 2]
+    D --> L[Directional Sun]
+
+    J --> J1["2 x 3 Solar Panels"]
+    K --> K1["2 x 3 Solar Panels"]
+
+    C4 --> M[Sun Position Engine]
+
+    M --> M1[Manual Azimuth]
+    M --> M2[Manual Elevation]
+    M --> M3[Date & Time]
+    M3 --> M4[SunCalc Library]
+
+    M1 --> L
+    M2 --> L
+    M4 --> L
+
+    L --> N[Shadow Engine]
+    H --> N
+    I --> N
+    J --> N
+    K --> N
+
+    N --> O[Shadow Analysis]
+
+    O --> O1[Shadow Percentage]
+    O --> O2[Ray Casting]
+    O --> O3[Bounding Box Check]
+
+    O1 --> P[Efficiency Engine]
+
+    P --> P1[Panel Efficiency]
+    P --> P2[Edge Occlusion Factor]
+    P --> P3[Panel Classification]
+
+    P1 --> E
+    P2 --> E
+    P3 --> E
+
+    B --> Q[Vercel Deployment]
+```
+
+---
+
+## Component Hierarchy
+
+```
+App
+│
+├── Layout
+│
+├── Sidebar
+│   ├── SunControls
+│   ├── BuildingControls
+│   ├── WaterTankControls
+│   ├── SolarTableControls
+│   └── ShadowAnalysisSummary
+│
+├── Canvas
+│   ├── Camera
+│   ├── OrbitControls
+│   ├── Ground
+│   ├── Buildings
+│   ├── WaterTanks
+│   ├── SolarTable 1
+│   │   ├── Panel 1
+│   │   ├── Panel 2
+│   │   ├── Panel 3
+│   │   ├── Panel 4
+│   │   ├── Panel 5
+│   │   └── Panel 6
+│   │
+│   ├── SolarTable 2
+│   │   ├── Panel 1
+│   │   ├── Panel 2
+│   │   ├── Panel 3
+│   │   ├── Panel 4
+│   │   ├── Panel 5
+│   │   └── Panel 6
+│   │
+│   └── Sun (DirectionalLight + helper sphere)
+│
+├── ShadowEngine       ← utils/shadowEngine.ts
+│
+├── EfficiencyEngine   ← utils/efficiencyEngine.ts
+│
+├── EOFCalculator      ← utils/eofEngine.ts
+│
+└── Dashboard
+    ├── Global Summary (avg efficiency, avg shadow, total/shaded panels)
+    ├── Per-Table Metrics (avg shadow %, avg efficiency, best/worst panel)
+    ├── Per-Panel Data Table (ID, shadow %, efficiency %, EOF, status)
+    └── Panel Status Grid (green / yellow / red cells)
+```
