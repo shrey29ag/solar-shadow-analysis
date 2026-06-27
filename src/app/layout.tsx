@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Solar Shadow Analysis",
   description: "Solar shadow and efficiency analysis web application",
+  icons: {
+    icon: "/solar.svg",
+  },
 };
 
 export default function RootLayout({
